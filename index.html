@@ -1,6 +1,960 @@
-<!DOCTYPE html>
-<html>
-	<body>
-		<iframe src="https://www.cdc.gov/bmi/child-teen-calculator/calculator.html" title="BMI Calculator for Child and Teen" height="1920"></iframe>
-	</body>
-</html>
+<head>
+	<meta charset="utf-8">
+	<title>BMI Calculator for Child and Teen</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet prefetch" type="text/css" href="/TemplatePackage/contrib/libs/bootstrap/5x/bootstrap.min.css">
+	<link rel="stylesheet prefetch" type="text/css" href="/TemplatePackage/5.0/css/app.css">
+	<link rel="stylesheet prefetch" type="text/css" href="/TemplatePackage/contrib/libs/fontawesome/6x/css/all.min.css">
+	<link rel="stylesheet prefetch" type="text/css" href="/bmi/child-teen-calculator/calculator-styles.css">
+
+	<script type="text/javascript" src="/TemplatePackage/contrib/libs/jquery/latest/jquery.min.js"></script>
+	<script type="text/javascript" src="/TemplatePackage/contrib/libs/bootstrap/5x/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/TemplatePackage/contrib/libs/moment/2.5.1/moment.min.js"></script>
+
+	<script type="text/javascript" src="/bmi/child-teen-calculator/js/toggle.js" async></script>
+	<script type="text/javascript" src="/bmi/child-teen-calculator/js/errors.js" async></script>
+	<script type="text/javascript" src="/bmi/child-teen-calculator/js/calculate.js" async></script>
+	<script type="text/javascript" src="/bmi/es/child-teen-calculator/js/calculate-spanish.js" async></script>
+	<script type="text/javascript" src="/bmi/child-teen-calculator/js/bmi_calc.js" async></script>
+</head>
+
+<div id="container" class="card mx-auto">
+	<div id="title" class="card-header text-white d-inline-flex align-items-center">
+		<img width="70" alt="CDC Logo" src="/TemplatePackage/5.0/img/logo/logo-notext.svg" class="mr-2 me-2" style="display: none;" />
+		<h3 class="h3 text-white m-0 title">BMI Calculator for Child and Teen</h3>
+		<h3 class="h3 text-white m-0 widget-title" style="display: none;">Child/Teen BMI Calculator</h3>
+	</div>
+	
+	<div class="card-body flex-fill overflow-auto">
+
+		<!-- FORM START -->
+		<div id="calc_form">
+			<form>
+				<div id="switch_group" class="section d-flex align-items-start justify-content-between flex-column flex-sm-row-reverse flex-sm-wrap">	
+					<a id="lang_btn" href="/bmi/es/child-teen-calculator/calculator.html" class="p-0 me-0 mb-2">Español</a>
+					
+					<button id="reset_btn" class="btn btn-link p-0 me-0 mb-2" type="button">Reset</button>
+					
+					<div id="unit_switch" class="radio_group w-sm-100 mb-2" role="group">
+						<h4 class="h4 mt-2 mb-2">Units</h4>
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="unit_switch_radio" id="us_units_radio" value="us_units" class="form-check-input" checked />
+							<label for="us_units_radio" class="form-check-label text-wrap ps-1">US Customary Units</label>
+						</div>
+
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="unit_switch_radio" id="metric_units_radio" class="form-check-input" value="metric_units" />
+							<label for="metric_units_radio" class="form-check-label text-wrap ps-1">Metric Units</label>
+						</div>
+					</div>
+				</div>
+
+				<div id="error_alert" role="alert" style="display: none;">
+					<div class="d-flex align-items-center alert alert-danger border border-danger">
+						<div class="me-2 text-danger">
+							<i class="fa-solid fa-triangle-exclamation fa-lg"></i>
+						</div>
+						<p class="m-0">Please check the accuracy of the information you entered.</p>
+					</div>
+				</div>
+
+				<div class="section">
+					<div class="mb-2">
+						<span class="h4 m-0">Sex</span>
+					</div>
+
+					<div class="radio_group mb-2" role="group">
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="sex_radio" id="sex_boy_radio" class="form-check-input" value="sex_boy" />
+							<label for="sex_boy_radio" class="form-check-label text-wrap">Boy</label>
+						</div>
+
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="sex_radio" id="sex_girl_radio" class="form-check-input" value="sex_girl" />
+							<label for="sex_girl_radio" class="form-check-label text-wrap">Girl</label>
+						</div>
+					</div>
+					
+					<p class="error_sex form-text text-danger" style="display: none;">
+						Please select a sex.
+					</p>
+				</div>
+
+				<div class="section">
+					<div class="mb-2">
+						<span class="h4 m-0">Age</span>
+					</div>
+
+					<div id="age_input_options" class="d-flex flex-column flex-sm-row flex-wrap radio_group mb-2" role="group">
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="age_radio" id="age_years_months_radio" class="form-check-input" value="age_years_months" checked />
+							<label for="age_years_months_radio" class="form-check-label text-wrap">Years, Months</label>
+						</div>
+
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="age_radio" id="age_months_radio" class="form-check-input" value="age_months" />
+							<label for="age_months_radio" class="form-check-label text-wrap">Months</label>
+						</div>
+
+						<div class="radio_group_option form-check-inline">
+							<input type="radio" name="age_radio" id="age_date_birth_radio" class="form-check-input" value="age_date_birth" />
+							<label for="age_date_birth_radio" class="form-check-label d-inline text-wrap">Date of Birth, Date of Measurement</label>
+						</div>
+					</div>
+
+					<div class="age_years_months_content">
+						<div class="d-flex flex-wrap mb-2 gap-2">
+							<div class="d-inline-flex align-items-center">
+<!-- 								<input type="number" id="age_years_input" class="form-control" min="2" max="19" pattern="[0-9]" /> -->
+								<input type="text" id="age_years_input" class="form-control" pattern="[0-9]*[,]?[0-9]+" inputmode="numeric" maxlength="6" />
+								<label for="age_years_input" class="form-control-label ms-2">years <small>(2 to 19)</small></label>
+							</div>
+
+							<div class="d-inline-flex align-items-center">
+<!-- 								<input type="number" id="age_months_input" class="form-control" min="0" max="11" pattern="[0-9]" /> -->
+								<input type="text" id="age_months_input" class="form-control" pattern="[0-9]*[,]?[0-9]+" inputmode="numeric" maxlength="6" />
+								<label for="age_months_input" class="form-control-label ms-2">months <small>(0 to 11)</small></label>
+							</div>
+						</div>
+					</div>
+
+					<div class="age_months_content" style="display: none;">
+						<div class="d-flex flex-wrap mb-2 gap-2">
+							<div class="d-inline-flex align-items-center">
+<!-- 								<input type="number" id="age_months_only_input" class="form-control" min="24" max="239" pattern="[0-9]" /> -->
+								<input type="text" id="age_months_only_input" class="form-control" pattern="[0-9]*[,]?[0-9]+" inputmode="numeric" maxlength="6" />
+								<label for="age_months_only_input" class="form-control-label ml-2 ms-2">months <small>(24 to 239)</small></label>
+							</div>
+						</div>
+					</div>
+
+					<div class="age_dates_content" style="display: none;">
+						<div class="d-flex flex-wrap mb-2 gap-2">
+							<div class="d-flex flex-column me-2">
+								<p class="mb-1"><b>Date of Birth</b></p>
+
+								<div class="date_select_group d-flex gap-2">
+									<label for="dob_month" hidden>Month:</label>
+									<select name="dob_month" id="dob_month" class="form-select" aria-label="Date of Birth Month select">
+										<option value="0" selected>Month</option>
+										<option value="01">January</option>
+										<option value="02">February</option>
+										<option value="03">March</option>
+										<option value="04">April</option>
+										<option value="05">May</option>
+										<option value="06">June</option>
+										<option value="07">July</option>
+										<option value="08">August</option>
+										<option value="09">September</option>
+										<option value="10">October</option>
+										<option value="11">November</option>
+										<option value="12">December</option>
+									</select>
+
+									<label for="dob_day" hidden>Day:</label>
+									<select name="dob_day" id="dob_day" class="form-select" aria-label="Date of Birth Day select">
+										<option value="0" selected>Day</option>
+										<option value="01">1</option>
+										<option value="02">2</option>
+										<option value="03">3</option>
+										<option value="04">4</option>
+										<option value="05">5</option>
+										<option value="06">6</option>
+										<option value="07">7</option>
+										<option value="08">8</option>
+										<option value="09">9</option>
+										<option value="10">10</option>
+										<option value="11">11</option>
+										<option value="12">12</option>
+										<option value="13">13</option>
+										<option value="14">14</option>
+										<option value="15">15</option>
+										<option value="16">16</option>
+										<option value="17">17</option>
+										<option value="18">18</option>
+										<option value="19">19</option>
+										<option value="20">20</option>
+										<option value="21">21</option>
+										<option value="22">22</option>
+										<option value="23">23</option>
+										<option value="24">24</option>
+										<option value="25">25</option>
+										<option value="26">26</option>
+										<option value="27">27</option>
+										<option value="28">28</option>
+										<option value="29">29</option>
+										<option value="30">30</option>
+										<option value="31">31</option>
+									</select>
+
+									<label for="dob_year" hidden>Year:</label>
+									<select name="dob_year" id="dob_year" class="form-select" aria-label="Date of Birth Year select">
+										<option value="0" selected>Year</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="d-flex flex-column me-2">
+								<p class="mb-1"><b>Date of Measurement</b></p>
+
+								<div class="date_select_group d-flex gap-2">
+									<label for="dom_month" hidden>Month:</label>
+									<select name="dom_month" id="dom_month" class="form-select" aria-label="Date of Measurement Month select">
+										<option value="0" selected>Month</option>
+										<option value="01">January</option>
+										<option value="02">February</option>
+										<option value="03">March</option>
+										<option value="04">April</option>
+										<option value="05">May</option>
+										<option value="06">June</option>
+										<option value="07">July</option>
+										<option value="08">August</option>
+										<option value="09">September</option>
+										<option value="10">October</option>
+										<option value="11">November</option>
+										<option value="12">December</option>
+									</select>
+
+									<label for="dom_day" hidden>Day:</label>
+									<select name="dom_day" id="dom_day" class="form-select" aria-label="Date of Measurement Day select">
+										<option value="0" selected>Day</option>
+										<option value="01">1</option>
+										<option value="02">2</option>
+										<option value="03">3</option>
+										<option value="04">4</option>
+										<option value="05">5</option>
+										<option value="06">6</option>
+										<option value="07">7</option>
+										<option value="08">8</option>
+										<option value="09">9</option>
+										<option value="10">10</option>
+										<option value="11">11</option>
+										<option value="12">12</option>
+										<option value="13">13</option>
+										<option value="14">14</option>
+										<option value="15">15</option>
+										<option value="16">16</option>
+										<option value="17">17</option>
+										<option value="18">18</option>
+										<option value="19">19</option>
+										<option value="20">20</option>
+										<option value="21">21</option>
+										<option value="22">22</option>
+										<option value="23">23</option>
+										<option value="24">24</option>
+										<option value="25">25</option>
+										<option value="26">26</option>
+										<option value="27">27</option>
+										<option value="28">28</option>
+										<option value="29">29</option>
+										<option value="30">30</option>
+										<option value="31">31</option>
+									</select>
+
+									<label for="dom_year" hidden>Year:</label>
+									<select name="dom_year" id="dom_year" class="form-select" aria-label="Date of Measurement Year select">
+										<option value="0" selected>Year</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<p class="error_age form-text text-danger" style="display: none;">
+						Please enter an age between 2 and 19 years old.
+					</p>
+				</div>
+
+				<div class="section">
+					<div class="us_units_content">
+						<div class="mb-2">
+							<span class="h4 m-0">Height</span>
+							<span class="height_inches_content form-text" style="display: none;">(decimal places allowed)</span>
+							<span class="height_fraction_content form-text">(to nearest 1/8<sup>th</sup> inch)</span>
+						</div>
+
+						<div id="height_radio" class="radio_group mb-2" role="group">
+							<div class="radio_group_option form-check-inline">
+								<input type="radio" name="height_radio" id="height_ft_inches_fraction_radio" class="form-check-input" value="height_ft_inches_fraction" checked />
+								<label for="height_ft_inches_fraction_radio" class="form-check-label text-wrap">Feet, Inches, Fraction</label>
+							</div>
+
+							<div class="radio_group_option form-check-inline">
+								<input type="radio" name="height_radio" id="height_inches_radio" class="form-check-input" value="height_inches" />
+								<label for="height_inches_radio" class="form-check-label text-wrap">Inches</label>
+							</div>
+						</div>
+
+						<div class="height_fraction_content">
+							<div class="d-flex flex-wrap mb-2 gap-2">
+								<div class="d-inline-flex align-items-center">
+<!-- 									<input type="number" id="height_feet_input" class="form-control" min="0" max="9" pattern="[0-9]" /> -->
+									<input type="text" id="height_feet_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+									<label for="height_feet_input" class="form-control-label ms-2">ft</label>
+								</div>
+
+								<div class="d-inline-flex align-items-center">
+<!-- 									<input type="number" id="height_inches_input" class="form-control" min="0" pattern="[0-9]" /> -->
+									<input type="text" id="height_inches_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+									<label for="height_inches_input" class="form-control-label ms-2">in</label>
+								</div>
+
+								<div class="d-inline-flex align-items-center">
+									<select name="height_fraction_inch" id="height_fraction_inch_input" class="form-select">
+										<option value="0"></option>
+										<option value="1/8">1/8</option>
+										<option value="1/4">1/4</option>
+										<option value="3/8">3/8</option>
+										<option value="1/2">1/2</option>
+										<option value="5/8">5/8</option>
+										<option value="3/4">3/4</option>
+										<option value="7/8">7/8</option>
+									</select>
+									<label for="height_fraction_inch_input" class="form-control-label ms-2">fraction of an inch</label>
+								</div>
+							</div>
+
+							<p class="form-text">(12 inches = 1 foot; Example: 4 feet, 5 1/2 inches)</p>
+						</div>
+
+						<div class="height_inches_content" style="display: none;">
+							<div class="d-flex flex-wrap mb-2 gap-2">
+								<div class="d-inline-flex align-items-center">
+<!-- 									<input type="number" id="height_inches_only_input" class="form-control" min="0" pattern="[0-9]" /> -->
+									<input type="text" id="height_inches_only_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+									<label for="height_inches_only_input" class="form-control-label ms-2">in</label>
+								</div>
+							</div>
+						</div>
+						
+						<p class="error_height form-text text-danger" style="display: none;">
+							Please enter a height less than or equal to 9 ft (108 in).
+						</p>
+					</div>
+
+					<div class="metric_units_content" style="display: none;">
+						<div class="mb-2">
+							<span class="h4 m-0">Height</span>
+							<span class="height_inches_content form-text">(decimal places allowed)</span>
+						</div>
+
+						<div class="d-flex flex-wrap mb-2 gap-2">
+							<div class="d-inline-flex align-items-center">
+<!-- 								<input type="number" id="height_cm_input" class="form-control" min="0" max="275" pattern="[0-9]" /> -->
+									<input type="text" id="height_cm_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+								<label for="height_cm_input" class="form-control-label ms-2 text-nowrap">centimeters (cm)</label>
+							</div>
+						</div>
+						
+						<p class="error_height form-text text-danger" style="display: none;">
+							Please enter a height less than or equal to 275 cm.
+						</p>
+					</div>
+				</div>
+
+				<div class="section">
+					<div class="us_units_content">
+						<div class="mb-2">
+							<span class="h4 m-0">Weight</span>
+							<span class="weight_lbs_content form-text" style="display: none;">(decimal places allowed)</span>
+							<span class="weight_lbs_fraction_content form-text">(to nearest 1/4<sup>th</sup> (0.25) pound)</span>
+						</div>
+
+						<div class="radio_group mb-2" role="group">
+							<div class="radio_group_option form-check-inline">
+								<input type="radio" name="weight_radio" id="weight_lbs_radio" class="form-check-input" value="weight_lbs" checked />
+								<label for="weight_lbs_radio" class="form-check-label text-wrap">Pounds</label>
+							</div>
+
+							<div class="radio_group_option form-check-inline">
+								<input type="radio" name="weight_radio" id="weight_lbs_fraction_radio" class="form-check-input" value="weight_lbs_fraction" />
+								<label for="weight_lbs_fraction_radio" class="form-check-label text-wrap">Pounds, Fraction</label>
+							</div>
+						</div>
+
+						<div class="weight_lbs_content">
+							<div class="d-flex flex-wrap mb-2 gap-2">
+								<div class="d-inline-flex align-items-center">
+<!-- 									<input type="number" id="weight_lbs_only_input" class="form-control" min="0" max="1000" pattern="[0-9]" /> -->
+									<input type="text" id="weight_lbs_only_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+									<label for="weight_lbs_only_input" class="form-control-label ms-2">lbs</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="weight_lbs_fraction_content" style="display: none;">
+							<div class="d-flex flex-wrap mb-2 gap-2">
+								<div class="d-inline-flex align-items-center">
+<!-- 									<input type="number" id="weight_lbs_input" class="form-control" min="0" max="1000" pattern="[0-9]" /> -->
+									<input type="text" id="weight_lbs_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+									<label for="weight_lbs_input" class="form-control-label ms-2">lbs</label>
+								</div>
+
+								<div class="d-inline-flex align-items-center">
+									<select name="weight_fraction_lb" id="weight_fraction_lb_input" class="form-select">
+										<option value="0"></option>
+										<option value="1/8">1/8</option>
+										<option value="1/4">1/4</option>
+										<option value="3/8">3/8</option>
+										<option value="1/2">1/2</option>
+										<option value="5/8">5/8</option>
+										<option value="3/4">3/4</option>
+										<option value="7/8">7/8</option>
+									</select>
+									<label for="weight_fraction_lb_input" class="form-control-label ms-2">fraction of a pound</label>
+								</div>
+							</div>
+
+							<p class="form-text">(8 ounces = 1/2 pound; Example: 75 3/4 pounds)</p>
+						</div>
+						
+						<p class="error_weight form-text text-danger" style="display: none;">
+							Please enter a weight less than 1,000 pounds.” 
+						</p>
+					</div>
+
+					<div class="metric_units_content" style="display: none;">
+						<div class="mb-2">
+							<span class="h4 m-0">Weight</span>
+							<span class="weight_lbs_content form-text">(decimal places allowed)</span>
+						</div>
+
+						<div class="d-flex flex-wrap mb-2 gap-2">
+							<div class="d-inline-flex align-items-center">
+<!-- 								<input type="number" id="weight_kg_input" class="form-control" min="0" max="454" pattern="[0-9]" /> -->
+								<input type="text" id="weight_kg_input" class="form-control" pattern="[0-9]*[.,]?[0-9]+" inputmode="decimal" maxlength="6" />
+								<label for="weight_kg_input" class="form-control-label ms-2">kilograms (kg)</label>
+							</div>
+						</div>
+						
+						<p class="error_weight form-text text-danger" style="display: none;">
+							Please enter a weight less than 454 kg.
+						</p>
+					</div>
+				</div>
+
+				<div class="section text-center mt-2">
+					<button id="calculate_btn" class="btn btn-primary w-full m-0" type="submit">Calculate</button>
+				</div>
+			</form>
+		</div>
+		<!-- FORM END -->
+
+		<!-- RESULTS START -->
+		<div id="calc_results" style="display: none;">
+			<div class="d-flex justify-content-end align-items-start">
+				<button class="back_btn btn btn-link">Back to Calculator</button>
+			</div>
+
+			<div class="section px-0">
+				<h4 class="h3 card-text mt-0 mb-2 px-3">Calculated Results</h4>
+
+				<div class="alert alert-info d-flex justify-content-around gap-4 p-3">
+					<div class="d-flex align-items-center gap-2">
+						<p class="h3 m-0"><span class="bmi_number">0</span></p>
+						<p class="h4 m-0">BMI</p>
+					</div>
+
+					<div class="d-flex align-items-center gap-2">
+						<p class="h3 m-0"><span class="bmi_category">category</span></p>
+						<p class="h4 m-0">BMI Category</p>
+					</div>
+
+					<div class="d-flex align-items-center gap-2">
+						<p class="h3 m-0"><span class="bmi_percentile">0</span><sup class="bmi_percentile_ordinal">th</sup></p>
+						<p class="h4 m-0">BMI Percentile</p>
+					</div>
+
+					<div class="over-95-percentile" style="display: none;">
+						<div class="d-flex flex-column align-items-center gap-2">
+							<p class="h3 m-0"><span class="bmi_percent_over_95_percentile"></span>%</p>
+							<p class="h4 m-0 text-wrap text-center">Percent of the 95th Percentile</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="section">
+				<h4 class="h3 card-text mt-1 mb-2">Information Entered</h4>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<div class="col d-inline-flex flex-wrap text-wrap">
+						<p class="me-2 mb-2"><b>Age<!-- <small>(at measurement)</small>-->:</b></p>
+						<p class="entered_age mb-2"></p>
+					</div>
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Sex:</b></p>
+						<p class="entered_sex mb-2"></p>
+					</div>
+				</div>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between age_dates_text_content" style="display: none;">
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Date of Birth:</b></p>
+						<p class="entered_dob mb-2"></p>
+					</div>
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Date of Measurement:</b></p>
+						<p class="entered_dom mb-2"></p>
+					</div>
+				</div>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Height:</b></p>
+						<p class="entered_height mb-2"><span class="entered_height_feet"></span><span class="entered_height_inches"></span><span class="entered_height_fraction"></span></p>
+					</div>
+
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Weight:</b></p>
+						<p class="entered_weight mb-2"></p>
+					</div>
+				</div>
+			</div>
+
+			<hr/>
+
+			<div class="section detailed_results">
+				<h4 class="h3 mt-0 mb-2">On this page</h4>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<p><a href="#what-does-this-mean">What does this mean?</a></p>
+
+					<p><a href="#what-can-parents-caregivers-and-teens-do">What can parents, caregivers, and teens do?</a></p>
+				</div>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<p><a href="#what-can-healthcare-providers-do">What can healthcare providers do?</a></p>
+
+					<p><a href="#additional-resources">Related Resources</a></p>
+				</div>
+			</div>
+
+			<hr class="detailed_results" />
+			
+			<div class="section container">
+				<h4 class="h3 card-text mt-0 mb-2 detailed_results">Detailed Results</h4>
+				
+				<div>
+					<p>Based on the information entered, the body mass index (BMI) is <b><span class="bmi_number">0</span></b>. This child's BMI-for-age is <span class="bmi_between_1_99_percent">at</span><span class="bmi_above_99_percent" style="display: none;">above</span><span class="bmi_under_1_percent" style="display: none;">less than</span> the <span class="bmi_percentile_paragraph">0</span><sup class="bmi_percentile_ordinal">th</sup> percentile, which means that this child's BMI is <span class="underweight" style="display: none;">less</span><span class="not-underweight">greater</span> than the BMIs of <span class="bmi_percentile_percent">0</span>% of <span class="entered_age_hyphen">0-year</span>-old <span class="entered_sex text-lowercase"></span>s in the reference population used to create CDC's growth charts. This child's BMI falls into the <b><span class="bmi_category"></span></b> category, defined as a BMI that is <span class="underweight" style="display: none;">less than the 5<sup>th</sup> percentile</span><span class="healthyweight" style="display: none;">at or above the 5<sup>th</sup> to less than the 85<sup>th</sup> percentile</span><span class="overweight" style="display: none;">at or above the 85<sup>th</sup> to less than the 95<sup>th</sup> percentile</span><span class="obesity" style="display: none;">at or above the 95<sup>th</sup> percentile</span><span class="severe-obesity" style="display: none;">at or above 120% of the 95<sup>th</sup> percentile</span> for sex and age<span class="severe-obesity" style="display: none;"> or a BMI that is at or above 35 kg/m<sup>2</sup></span>.</p>
+				</div>
+			</div>
+
+			<div class="section detailed_results">
+				<h4 class="text-center mt-0 mb-5">
+					Body mass index-for-age percentiles:
+					<span class="entered_sex"></span>s, 2 to 20 years
+				</h4>
+				<div class="graph mb-2">
+					<!-- Under 97% Graph -->
+					<div id="under-97-graph" class="mx-auto position-relative" style="display: none;">
+						<img 
+							id="bmi-under-97-image"
+							alt="bmi percentile display image as per text results"
+						/>
+						<div id="bmi-under-97-plots-canvas" class="position-absolute top-0 left-0">
+							<svg id="bmi-under-97-plots" height="60" width="100">
+								<text x="1" y="32">
+									<tspan style="display: inline; font-size: x-large; font-weight: 900;" class="bmi_percentile">35</tspan>
+									<tspan dy="-9" dx="-4" style="font-size: large; font-weight: 700;" class="bmi_percentile_ordinal">th</tspan>
+								</text>
+								<circle cx="12" cy="48" r="7" stroke="black" stroke-width="4" fill="transparent"></circle>
+							</svg>
+							<!-- BMI Off Graph -->
+							<div id="off_under_graph" class="mx-auto" style="display: none;">
+								* This child's BMI of
+								<span class="bmi_number"></span> can't
+								be displayed on this growth chart.
+							</div>
+						</div>
+					</div>
+					<!-- Over 97% Graph -->
+					<div id="over-97-graph" class="mx-auto position-relative" style="display: none;">
+						<img 
+							id="bmi-over-97-image"
+							alt="bmi percentile display image as per text results"
+						/>
+						<div id="bmi-over-97-plots-canvas" class="position-absolute top-0 left-0">
+							<svg id="bmi-over-97-plots" height="60" width="100">
+								<text x="1" y="32">
+									<tspan style="display: inline; font-size: x-large; font-weight: 900;" class="bmi_percentile">35</tspan>
+									<tspan dy="-9" dx="-4" style="font-size: large; font-weight: 700;" class="bmi_percentile_ordinal">th</tspan>
+								</text>
+								<circle cx="12" cy="48" r="7" stroke="black" stroke-width="4" fill="transparent"></circle>
+							</svg>
+							<!-- BMI Off Graph -->
+							<div id="off_over_graph" class="mx-auto" style="display: none;">
+								* This child's BMI of
+								<span class="bmi_number"></span> can't
+								be displayed on this growth chart.
+							</div>
+						</div>
+					</div>
+					<!-- BMI Off Graph -->
+					<div id="off-graph" class="mx-auto" style="display: none;">
+						* This child's BMI of
+						<span class="bmi_number"></span> can't
+						be displayed on this growth chart.
+					</div>
+				</div>
+			</div>
+			
+			<div class="section container detailed_results">
+				<h4 id="what-does-this-mean" class="h3 mt-0 mb-2">What does this mean?</h4>
+
+				<div id="detailed_results" class="d-flex gap-3">
+					<div>
+						<p>
+							<b>BMI</b> is a calculated measure
+							of weight relative to height. BMI is used to
+							assess a child's physical growth.
+						</p>
+						<p>
+							Because children and teens are growing, BMI
+							values must be expressed relative to other
+							children of the same sex and age.
+							<b>BMI-for-age percentiles</b>
+							indicate how your child's BMI compares
+							to BMIs of children of the same sex and age
+							in the reference population used to create
+							the CDC growth charts.
+						</p>
+					</div>
+
+					<div class="detailed_results">
+						<table id="bmi_table" class="table table-light" summary="BMI: Severe Obesity">
+							<caption hidden>BMI Category Percentile Ranges Table</caption>
+							<thead class="table-dark">
+								<tr>
+									<th scope="col">BMI Category</th>
+									<th scope="col">BMI Range</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="table_underweight">
+									<th scope="row">
+										<div>
+											<div class="chevron_icon text-primary me-2 underweight" style="display: none;">
+												<i class="fa-solid fa-caret-right fa-2xl"></i>
+											</div>
+											Underweight
+										</div>
+									</th>
+									<td>Less than the 5<sup>th</sup> percentile</td>
+								</tr>
+								<tr class="table_healthyweight">
+									<th scope="row">
+										<div>
+											<div class="chevron_icon text-primary me-2 healthyweight" style="display: none;">
+												<i class="fa-solid fa-caret-right fa-2xl"></i>
+											</div>
+											Healthy Weight
+										</div>
+									</th>
+									<td>5<sup>th</sup> percentile to less than the 85<sup>th</sup> percentile</td>
+								</tr>
+								<tr class="table_overweight">
+									<th scope="row">
+										<div>
+											<div class="chevron_icon text-primary me-2 overweight" style="display: none;">
+												<i class="fa-solid fa-caret-right fa-2xl"></i>
+											</div>
+											Overweight
+										</div>
+									</th>
+									<td>85<sup>th</sup> percentile to less than the 95<sup>th</sup> percentile</td>
+								</tr>
+								<tr class="table_obesity">
+									<th scope="row">
+										<div>
+											<div class="chevron_icon text-primary me-2 obesity" style="display: none;">
+												<i class="fa-solid fa-caret-right fa-2xl"></i>
+											</div>
+											Obesity
+										</div>
+									</th>
+									<td>95<sup>th</sup> percentile or greater</td>
+								</tr>
+								<tr class="table_severe_obesity">
+									<th scope="row">
+										<div>
+											<div class="chevron_icon text-primary me-2 severe-obesity" style="display: none;">
+												<i class="fa-solid fa-caret-right fa-2xl"></i>
+											</div>
+											Severe Obesity
+										</div>
+									</th>
+									<td>120% of the 95<sup>th</sup> percentile or greater OR a BMI of 35 kg/m<sup>2</sup> or greater</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="section text-center" style="display: none;">
+				<a id="detailed_results_btn" href="/bmi/child-teen-calculator/index.html" target="_blank" class="btn btn-primary w-100">Detailed Results, Growth Chart, and Resources</a>
+			</div>
+
+			<div class="section detailed_results">
+				<h4 id="what-can-parents-caregivers-and-teens-do" class="h3 mt-0 mb-2">What can parents, caregivers, and teens do?</h4>
+
+<!-- 				<div class="d-inline-flex mb-2">
+					<p class="d-flex flex-column">
+						Discuss the BMI results with your healthcare provider as BMI can relate to overall health and well-being.
+						<a href="/obesity/basics/childhood-defining.html" class="btn btn-outline-primary mt-2" style="width: fit-content;" target="_blank">Learn more about Defining Child BMI Categories</a>
+					</p>
+				</div>
+				<div class="d-inline-flex mb-2">
+					<p class="d-flex flex-column">
+						Encourage children and teens to build and practice healthy routines.
+						<a href="/healthyweight/children/index.html" class="btn btn-outline-primary mt-2" style="width: fit-content;" target="_blank">Tips to Support Healthy Routines for Children and Teens</a>
+					</p>
+				</div> -->
+				<p>
+					Discuss the BMI results with your healthcare provider as BMI can relate to overall health and well-being. Learn more about <a href="/bmi/child-teen-calculator/bmi-categories.html">Defining Child BMI Categories</a>. Encourage children and teens to <a href="/healthy-weight-growth/tips-parents-caregivers/index.html">build and practice healthy routines</a>.
+				</p>
+				
+				<p class="not-under-or-healthy-or-over" style="display: none;">
+					Having <span class="severe-obesity" style="display: none;">severe </span>
+					obesity can increase a child or teen's risk for
+					physical health conditions, including type 2 diabetes
+					and high cholesterol, and mental health conditions,
+					including anxiety and depression. Children with
+					<span class="severe-obesity" style="display: none;">severe </span>obesity
+					are also more likely to have obesity
+					<span class="severe-obesity" style="display: none;">or severe obesity</span>
+					in adulthood, which is associated with additional
+					chronic health conditions, including cardiovascular disease,
+					joint problems, and many types of cancer.
+				</p>
+<!-- 				<p>
+					Please keep in mind that BMI is a screening
+					measure and is not intended to diagnose disease
+					or illness. This BMI calculator is not meant to
+					serve as a source of clinical guidance and is
+					not intended to be a substitute for professional
+					medical advice.
+				</p> -->
+				
+<!-- 				<div class="dfe-block dfe-callout dfe-callout--standard">
+					<div class="dfe-callout__icon" aria-hidden="true" role="img"></div>
+					<h3>Keep in mind</h3>
+					<div class="dfe-callout__body">
+						<div class="callout-desc">Discuss the BMI results with your healthcare provider as BMI can relate to overall health and well-being. Learn more about <a href="/bmi/child-teen-calculator/bmi-categories.html">Defining Child BMI Categories</a>. Encourage children and teens to <a href="/healthy-weight-growth/tips-parents-caregivers/index.html">build and practice healthy routines</a>.</div>
+					</div>
+				</div> -->
+				
+				<div class="dfe-block dfe-callout dfe-callout--standard">
+					<div class="dfe-callout__icon" aria-hidden="true" role="img"></div>
+					<h3>Remember</h3>
+					<div class="dfe-callout__body">
+						<div class="callout-desc">
+							Please keep in mind that BMI is a screening
+							measure and is not intended to diagnose disease
+							or illness. This BMI calculator is not meant to
+							serve as a source of clinical guidance and is
+							not intended to be a substitute for professional
+							medical advice.
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section detailed_results">
+				<h4 id="what-can-healthcare-providers-do" class="h3 mt-0 mb-2">What can healthcare providers do?</h4>
+
+				<p>
+					Healthcare providers can assess height, weight,
+					and BMI percentile at least annually for all
+					children to help monitor growth relative to
+					other children of the same age and sex.
+					Healthcare providers can also assess for social
+					and health risk factors, such as food insecurity
+					and family history, and work with the patient
+					and family on an individual plan to
+					<span class="healthyweight">maintain a healthy weight and help prevent chronic conditions.</span>
+					<span class="not-healthyweight" style="display: none;">identify supports and treatment options.</span>
+				</p>
+				<div class="not-under-or-healthy" style="display: none;">
+					<div class="d-inline-flex mb-3">
+						<p class="d-flex flex-column">
+							Recommended treatment might include referral to a
+							Family Healthy Weight Program.
+							These are comprehensive, family-based lifestyle
+							change programs that help children and adolescents
+							with overweight or obesity make progress towards
+							a healthier weight through positive behavior changes.
+						</p>
+					</div>
+				</div>
+			</div>
+			
+			<div class="section detailed_results">
+				<h4 id="additional-resources" class="h3 mt-0 mb-2">Related Resources</h4>
+
+				<ul>
+					<li class="mb-2">
+						<a href="/healthy-weight-growth/tips-parents-caregivers/index.html" target="_blank">Tips to Support Healthy Routines for Children and Teens</a>
+					</li>
+					<li class="overweight mb-2" style="display: none;">
+						<a href="/obesity/family-action/index.html" target="_blank">Preventing Childhood Obesity: 6 Things Families Can Do</a>
+					</li>
+					<li class="mb-2">
+						<a href="/nutrition/php/resources/healthy-eating-benefits-for-children.html" target="_blank">Benefits of Healthy Eating for Children</a>
+					</li>
+					<li class="not-underweight mb-2" style="display: none;">
+						<a href="/physical-activity-basics/adding-children-adolescents/index.html" target="_blank">Making Physical Activity Part of a Child's Life</a>
+					</li>
+					<li class="not-obesity-or-severe-obesity mb-2" style="display: none;">
+						<a href="/healthy-weight-growth/water-healthy-drinks/index.html" target="_blank">About Water and Healthier Drinks</a>
+					</li>
+					<li class="not-obesity-or-severe-obesity mb-2" style="display: none;">
+						<a href="/sleep/about/index.html" target="_blank">Are You Getting Enough Sleep?</a>
+					</li>
+					<li class="not-under-or-healthy mb-2" style="display: none;">
+						<a href="/obesity/php/about/risk-factors.html" target="_blank">Risk Factors for Obesity</a>
+					</li>
+					<li class="not-under-or-healthy-or-over mb-2" style="display: none;">
+						<a href="/obesity/basics/consequences.html" target="_blank">Consequences of Obesity</a>
+					</li>
+					<li class="not-under-or-healthy mb-2" style="display: none;">
+						<a href="/family-healthy-weight/php/recognized-programs/index.html" target="_blank">Family Healthy Weight Programs</a>
+					</li>
+					<li class="not-under-or-healthy-or-over mb-2" style="display: none;">
+						<a href="https://www.niddk.nih.gov/health-information/weight-management/prescription-medications-treat-overweight-obesity" target="_blank">Prescription Medications to Treat Obesity</a>
+					</li>
+					<li class="severe-obesity mb-2" style="display: none;">
+						<a href="https://www.niddk.nih.gov/health-information/weight-management/bariatric-surgery" target="_blank">Weight Loss (Metabolic and Bariatric) Surgery</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="section text-center mt-4">
+				<button class="back_btn btn btn-outline-primary w-100 w-sm-50">Back to Calculator</button>
+			</div>
+		</div>
+		<!-- RESULTS END -->
+		
+		<!-- ERROR -->
+		<div id="error" style="display: none;">
+			<div class="d-flex justify-content-end align-items-start">
+				<button class="back_btn btn btn-link">Back to Calculator</button>
+			</div>
+
+			<div id="bmi_error_alert" role="alert" class="section px-0">
+				<div class="alert alert-danger border border-danger p-3">
+					<div class="d-flex align-items-baseline mb-2">
+						<div class="me-3 text-danger">
+							<i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+						</div>
+						<p class="h5 m-0">Error</p>
+					</div>
+					<p class="m-0">The calculated BMI appears to be out of range. Please check the accuracy of the information you entered.</p>
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="section">
+				<h4 class="card-text h3 mt-1 mb-2">Information Entered</h4>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<div class="col d-inline-flex flex-wrap text-wrap">
+						<p class="me-2 mb-2"><b>Age<!-- <small>(at measurement)</small>-->:</b></p>
+						<p class="entered_age mb-2"></p>
+					</div>
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Sex:</b></p>
+						<p class="entered_sex mb-2"></p>
+					</div>
+				</div>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between age_dates_text_content" style="display: none;">
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Date of Birth:</b></p>
+						<p class="entered_dob mb-2"></p>
+					</div>
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Date of Measurement:</b></p>
+						<p class="entered_dom mb-2"></p>
+					</div>
+				</div>
+
+				<div class="row row-cols-1 row-cols-sm-2 justify-content-between">
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Height:</b></p>
+						<p class="entered_height mb-2"><span class="entered_height_feet"></span><span class="entered_height_inches"></span><span class="entered_height_fraction"></span></p>
+					</div>
+
+					<div class="col d-inline-flex flex-wrap">
+						<p class="me-2 mb-2"><b>Weight:</b></p>
+						<p class="entered_weight mb-2"></p>
+					</div>
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="section text-center mt-4">
+				<button id="recalculate_btn" class="back_btn btn btn-outline-primary w-full">Recalculate</button>
+			</div>
+		</div>
+		
+		<!-- LOADING -->
+		<div id="loading" style="display: none;">
+			<div class="section">
+				<h4 class="h3 card-text mt-0">Please wait while your BMI is calculated...</h4>
+				<div class="d-flex align-items-center justify-content-center text-center mb-3">
+					<div class="loader" id="loader-circle"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- WIDGET EMBED -->
+		<div id="widget_embed" style="display: none;">
+			<h4 class="h3 card-text mt-0">Embed this widget on your site</h4>
+			<label for="embed_textarea" class="form-label">Copy and paste the code below:</label>
+			<textarea class="form-control" id="embed_textarea" rows="8" disabled><iframe src="https://www.cdc.gov/bmi/child-teen-calculator/calculator.html" title="BMI Calculator for Child and Teen" height="680"></iframe></textarea>
+			<div class="mt-2 text-center">
+				<button id="copy_code_btn" class="btn btn-outline-primary">
+					<div class="me-2 d-inline">
+						<i class="fa-regular fa-copy fa-lg"></i>
+					</div>
+					<span id="copy_code_text">Copy Code</span>
+					<span id="code_copied_text" style="display: none;">Copied</span>
+				</button>
+			</div>
+		</div>
+
+		<!-- WIDGET PRIVACY -->
+		<div id="widget_privacy" style="display: none;">
+			<h4 class="h3 card-text mt-0">Privacy Policy</h4>
+			<p>The Centers for Disease Control and Prevention (CDC) is committed to maintaining your privacy and protecting your personal information when you visit CDC websites, use CDC's mobile applications, or receive public health information from CDC. With respect to the collection, use, and disclosure of personally identifiable information (PII), CDC complies with all applicable federal laws.</p>
+			<p class="mb-1">For more information visit CDC.gov:</p>
+			<a href="https://www.cdc.gov/other/privacy.html" target="_blank" class="btn btn-outline-primary w-100" style="min-width: fit-content;">CDC Privacy Policy</a>
+		</div>
+
+		<!-- WIDGET DISCLAIMER -->
+		<div id="widget_disclaimer" style="display: none;">
+			<h4 class="h3 card-text mt-0">Disclaimer</h4>
+			<p>This calculator provides body mass index (BMI) and the corresponding BMI-for-age percentile based on CDC growth charts for children and teens ages 2 through 19 years. Because of possible rounding errors in age, weight, and height, the results from this calculator may differ slightly from BMI-for-age percentiles calculated by other programs.</p>
+			<p><i>This BMI calculator is not meant to serve as a source of clinical guidance. It is not intended to be a substitute for professional medical advice.</i></p>
+		</div>
+	</div>
+
+	<!-- WIDGET FOOTER -->
+	<div id="widget_footer" class="card-footer text-center bg-transparent">
+		<div id="footer_btn_group" class="w-100">
+			<div class="d-flex flex-wrap align-items-stretch gap-2 w-100" role="group">
+				<button id="embed_btn" type="button" class="btn btn-outline-primary flex-grow-1">Embed</button>
+				<button id="privacy_btn" type="button" class="btn btn-outline-primary flex-grow-1">Privacy</button>
+				<button id="disclaimer_btn" type="button" class="btn btn-outline-primary flex-grow-1">Disclaimer</button>
+			</div>
+		</div>
+
+		<button id="footer_return_btn" class="btn btn-primary flex-grow-1 w-100" style="display: none;">Return to Calculator</button>
+	</div>
+</div>
